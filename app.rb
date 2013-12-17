@@ -132,6 +132,7 @@ post '/signin' do
   redirect '/'
 end
 
+
 get '/enter' do
   erb :'registration/enter'
 end
