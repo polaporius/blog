@@ -1,3 +1,6 @@
+<% @user.errors.each do |k,v| %>
+  <p><%= "#{k} #{v}"%></p>
+<% end %> 
 <div class="msg">
   <form class="form-horizontal" action='signup' method="post">
   <fieldset>
@@ -7,9 +10,9 @@
     <div class="control-group">
       <label class="control-label"  for="name">Username</label>
       <div class="controls">
-        <input type="text" value="<%= flash[:name] %>" id="name" name="name" placeholder="Name" class="input-xlarge">
-        <% if flash[:error_name] %>
-        <p class="help-block"><%= flash[:error_name] %></p>
+        <input type="text" value="<%= @user.name %>" id="name" name="name" placeholder="Name" class="input-xlarge">
+        <% if @user.errors[:name] %>
+        <p class="help-block"><%= @user.errors[:name] %></p>
         <% else %>
         <p class="help-block">Please enter your name</p>
         <% end %>
@@ -20,9 +23,11 @@
     <div class="control-group">
       <label class="control-label" for="email">E-mail</label>
       <div class="controls">
-        <input type="text" id="email" value="<%= flash[:email] %>" name="email" placeholder="Email" class="input-xlarge">
-        <% if flash[:error_email] %>
-        <p class="help-block"><%= flash[:error_email] %></p>
+        <input type="text" id="email" value="<%= @user.email %>" name="email" placeholder="Email" class="input-xlarge">
+        <% if @user.errors[:email].any? %>
+        <% @user.errors[:email].each do |v| %>
+          <p class="help-block"><%= v %></p>
+          <% end %>
         <% else %>
         <p class="help-block">Please enter your email</p>
         <% end %>

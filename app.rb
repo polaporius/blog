@@ -7,6 +7,7 @@ require_relative './helpers/validation'
 helpers Posting, Validation
 Dir.foreach('models/') { |model| require "./models/#{model}" if model.match /.rb$/ }
 
+
 configure do
   enable :sessions
   set :session_secret, 'secret'
@@ -78,8 +79,8 @@ end
 delete "/posts/:id/comment/:id_comment" do
    @post = Post.find(params[:id])  
    if author? @post
-     @comm = Comment.find(params[:id_comment]).destroy
-     redirect "/posts/#{@comm.post_id}"
+      @comm = Comment.find(params[:id_comment]).destroy
+      redirect "/posts/#{@comm.post_id}"
    end
 end
 
@@ -96,27 +97,30 @@ get "/about" do
   erb :"pages/about"
 end
 
+get "/signup" do
+  @title='Sign up'
+  @user = User.new
+  erb :'registration/register'      
+end
+
 post '/signup' do
-  @user=User.find_by_email(params[:email]) 
-  valid_signup
-  p flash
-    unless @user || params[:password] != params[:password_second] || params[:password].empty? || flash[:error_email]
-      hash = Digest::SHA2.hexdigest(params[:password] + User::SALT)
-      @user = User.new(name: params[:name], :password => hash, email: params[:email])
-      if @user.save
-        redirect '/enter'
-      else
-        redirect '/reg'
-      end
-    else 
-      redirect '/reg'
+  @user = User.new(user_params)
+  if User.is_persisted?(params[:email])
+    @user.valid?
+    erb :'registration/register'
+  else
+    @user.password_second = params[:params_second]
+    @user.save 
+    unless @user.errors.empty?
+      erb :'registration/register'
+    else
+      redirect '/enter'
     end
-  
+  end
 end
 
 
 post '/signin' do
-  valid_signin
   password = Digest::SHA2.hexdigest(params[:password] + User::SALT)
   user = User.find_by(email: params[:email], password: password)
   if user    
@@ -130,15 +134,20 @@ post '/signin' do
 end
 
 get '/enter' do
-  erb :"registration/enter"
-end
-
-get "/reg" do
-  @title='Sign up'
-  erb :"registration/register"      
+  erb :'registration/enter'
 end
 
 post '/logout' do
   session.clear
   redirect '/'
 end 
+
+def user_params
+  permit params, :name, :email, :password
+end
+
+def permit hash, *keys #filters hash for unavailable parameters
+  result = {}
+  keys.each { |k| result[k] = hash[k] }
+  result 
+end
