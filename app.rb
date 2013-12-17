@@ -3,7 +3,7 @@ require "sinatra/activerecord"
 require 'digest/sha2'
 require 'sinatra/flash'
 require_relative './helpers/posting'
-helpers Posting, Validation
+helpers Posting
 Dir.foreach('models/') { |model| require "./models/#{model}" if model.match /.rb$/ }
 
 
