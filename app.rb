@@ -108,7 +108,7 @@ post '/signup' do
     @user.valid?
     erb :'registration/register'
   else
-    @user.password_second = params[:params_second]
+    @user.password_second = params[:password_second]
     @user.save 
     unless @user.errors.empty?
       erb :'registration/register'
