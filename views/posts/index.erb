@@ -1,0 +1,12 @@
+<h1>Welcome to my blog!</h1>
+<section>  
+<% @posts.each do |post| %>
+  <article>
+    <h2><a href="/posts/<%= post.id %>"><%= post.title %></a>
+    <h4>Created by <%= post.user_name %></h4>
+    <span><%= pretty_date(post.created_at) %></span></h2>
+    <p><%= post.body[0, 400]+"..." %></p>
+    <a href="/posts/<%= post.id %>"  class="btn btn-primary pull-right">Read more...</a>
+  </article>
+<% end %>
+</section>

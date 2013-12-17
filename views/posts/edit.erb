@@ -1,0 +1,17 @@
+<h1>Edit Post</h1>
+  <div class="row">
+    <div class="col-sm-4 col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-body">                
+          <form action="/posts/<%= @post.id %>" method="post">
+          <input type="hidden" name="_method" value="put" /> 
+          <label for="post_title">Title:</label>
+          <textarea id="post_title" class="form-control counted" name="post[title]" type="text"><%= @post.title %></textarea>
+          <label for="post_body">Body:</label>
+          <textarea id="post_body" class="form-control counted" name="post[body]" rows="5"><%= @post.body %></textarea>
+          <input type="submit" class="btn btn-info" value="Edit Post" />
+          </form>  
+        </div>
+      </div>
+    </div>
+</div>
