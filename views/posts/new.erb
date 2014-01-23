@@ -5,14 +5,20 @@
         <div class="panel-body">                
           <form action="/posts" method="post">
             <label for="post_title">Title:</label><br />
-            <input type="text" value="<%= flash[:title] %>" id="title" name="title" placeholder="" class="form-control counted">
+            <input type="text" value="<%= @post.title if @post %>" id="title" name="title" placeholder="" class="form-control counted">
              <br />
-             <p class="help-block"><%= flash[:error_title] %></p>
+             <% if @post.errors%>
+              <% @post.errors[:title].each do |title| %>
+                <p class="help-block"><%= title %></p>
+              <% end %>
             <label >Body:</label><br />
             <textarea  class="form-control counted" id="body"  name="body" rows="5"></textarea>
             <br />
-            <p class="help-block"><%= flash[:error_body] %></p>
+            <% @post.errors[:body].each do |body| %>
+                <p class="help-block"><%= body %></p>
+              <% end %>
             <input type="submit" class="btn btn-info" value="Create Post" />
+            <% end %>
           </form>
         </div>
       </div>

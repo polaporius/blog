@@ -3,9 +3,8 @@ class Post < ActiveRecord::Base
   validates :body, presence: true
   belongs_to :user
   has_many :comments, :dependent => :destroy
-
+  
   def user_name
   	user.name
   end
-
 end

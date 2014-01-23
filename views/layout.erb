@@ -1,11 +1,17 @@
-<html>
-<head>
-  <title><%= title %></title>
-  <link href="/css/bootstrap.css" rel="stylesheet">
-</head>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title><%= @title %></title>
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/bootstrap-theme.css" rel="stylesheet">
+  </head>
 
   <body>
-    <div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -16,44 +22,44 @@
         </div>
          <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-              <li><a href="/">Home</a></li>
-              <li><a href="/about">About Me</a></li>
-              <% unless session[:all]==nil %>             
-                <li><a href="/posts/new">New Post</a></li> 
-                <% if post_show_page?  %>
-                  <% if author? @post %>
-                    <li><a href="/posts/<%= @post.id %>/edit">Edit Post</a></li>
-                  <% end %>
-                <% end %>   
-                <form class="nav navbar-right" action="/logout" method="post" >
-                  <button type="submit" class="btn btn-success">Log out</button>
-                  <p class="text-info">Welcome, <%= session[:name] %></p>
-                </form>
-              <% else  %>
-                 <form action = "/reg" method = "get" class="navbar-form navbar-right">
+    <li><a href="/">Home</a></li>
+    <li><a href="/about">About Me</a></li>
+    <% unless session[:all]==nil %>             
+    <li><a href="/posts/new">New Post</a></li> 
+    <% if post_show_page?  %>
+      <% if author? @post %>
+      <li><a href="/posts/<%= @post.id %>/edit">Edit Post</a></li>
+      <% end %>
+    <% end %>   
+      <form class="nav navbar-right" action="/logout" method="post" >
+        <button type="submit" class="btn btn-success">Log out</button>
+        <p class="text-info">Welcome, <%= session[:all].name %></p>
+      </form>
+    <% else  %>
+    <form action = "/reg" method = "get" class="navbar-form navbar-right">
                <button type="submit" class="btn btn-success">Sign up</button>
-               </form>
-               <form  action="/signin" method="post" class="navbar-form navbar-right">
-                 <div class="form-group">
-                   <input id="email" type="text" name="email" placeholder="Email" class="form-control">
-                 </div>
-                 <div class="form-group">
+            </form>
+            <form  action="/signin" method="post" class="navbar-form navbar-right">
+                <div class="form-group">
+                  <input id="email" type="text" name="email" placeholder="Email" class="form-control">
+                </div>
+                <div class="form-group">
                    <input type="password" name="password" placeholder="Password" class="form-control">
-                 </div>
-                 <button type="submit" class="btn btn-success">Sign in</button>
-                 <% if flash[:error_email_signin] %>
-                   <div class="alert alert-warning"><%=flash[:error_email_signin]%></div>
-                 <% end %>
+                </div>
+                <button type="submit" class="btn btn-success">Sign in</button>
+                <% if flash[:error] %>
+                <div class="alert alert-danger"><%=flash[:error]%></div>
+                <% end %>
               </form>    
-              <% end %>                      
-            </div>
-          </div>
-        </div>
+              <% end %>        
+      </div>
+       </div>
+      </div>
       <div class="container">
-    <div class="msg">
-      <%= yield %>
-    </ul>
+        <div class="msg">
+  <%= yield %>
+  </ul>
 </div>
-</div>
+  </div>
 </body>
 </html>

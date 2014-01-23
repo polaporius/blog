@@ -1,10 +1,12 @@
 require "sinatra"
+require 'rubygems'
 require "sinatra/activerecord"
-require 'digest/sha2'
 require 'sinatra/flash'
-require_relative './helpers/posting'
-helpers Posting
+require "digest/sha2"
+
 Dir.foreach('models/') { |model| require "./models/#{model}" if model.match /.rb$/ }
+Dir.foreach('./helpers/') { |model| require_relative "./helpers/#{model}" if model.match /.rb$/ }
+helpers Posting
 
 
 configure do
@@ -28,82 +30,84 @@ end
 
 post "/posts/:id/create_comment" do
   @post = Post.find(params[:id])
-  valid_comment
-  @comm = Comment.new( 
-                      body: params[:body], 
-                      post_id: params[:id], 
-                      user_name: session[:name], 
-                      user_id: session[:user_id])
+  @comm = Comment.new(title: params[:title],
+                      body: params[:body],
+                      post_id: params[:id],
+                      user_name: session[:all].name,
+                      user_id: session[:all].id)
   @comm.save
-  redirect "/posts/#{@comm.post_id}"
+  unless @comm.errors.empty?
+    @comm.valid?
+    erb :"posts/show"
+  else
+    redirect "/posts/#{params[:id]}"
+  end
 end
 
 
-post "/posts" do
-  valid_post
-  flash[:title] = params[:title]  
-  user_id = session[:user_id]
-  @post = Post.new(title: params[:title], body: params[:body], user_id: user_id)
-  if @post.save
-    redirect "posts/#{@post.id}"
+post "/posts" do  
+  @post = Post.new(title: params[:title], body: params[:body], user_id: session[:all].id)
+  @post.save
+  unless @post.errors.empty?
+    @post.valid?
+    erb :"posts/new"
   else
-    redirect '/posts/new'
-    flash[:errors] = post.errors.message
+    redirect "posts/#{@post.id}"
   end
 end
  
 
 get "/posts/:id" do
-  @post = Post.find params[:id]
+  @post = Post.find(params[:id])
   erb :"posts/show"
 end
 
 
 get "/posts/:id/edit" do
-  @post = Post.find params[:id]
+  @post = Post.find(params[:id])
   @title = "Edit Form"
   erb :"posts/edit"
 end
  
 
 put "/posts/:id" do
-  @post = Post.find params[:id]
-  if @post.update_attributes(params[:post])
-    redirect "/posts/#{@post.id}"
-  else
-    erb :"posts/edit"
+  @post = Post.find(params[:id])
+  if author? @post
+    if @post.update_attributes(params[:post]) 
+      redirect "/posts/#{@post.id}"
+    else
+      erb :"posts/edit"
+    end
   end
 end
+
 
 delete "/posts/:id/comment/:id_comment" do
-   @post = Post.find(params[:id])  
-   if author? @post
-      @comm = Comment.find(params[:id_comment]).destroy
-      redirect "/posts/#{@comm.post_id}"
-   end
+  @comm = Comment.find(params[:id_comment])  
+  if author? @comm.post
+    @comm = Comment.find(params[:id_comment]).destroy
+    redirect "/posts/#{params[:id]}"
+  end
 end
 
+
 delete "/posts/:id" do
-  @post = Post.find params[:id]  
+  @post = Post.find(params[:id])  
   if author? @post 
-    @post = Post.find(params[:id]).destroy
+    @post.destroy
+    redirect "/"
   end
-  redirect "/"
 end
+
 
 get "/about" do
   @title = "About Me"
   erb :"pages/about"
 end
 
-get "/signup" do
-  @title='Sign up'
-  @user = User.new
-  erb :'registration/register'      
-end
 
 post '/signup' do
-  @user = User.new(user_params)
+  @user = User.new(name: params[:name], email: params[:email], password: params[:password])
   if User.is_persisted?(params[:email])
     @user.valid?
     erb :'registration/register'
@@ -111,6 +115,7 @@ post '/signup' do
     @user.password_second = params[:password_second]
     @user.save 
     unless @user.errors.empty?
+      @user.valid?
       erb :'registration/register'
     else
       redirect '/enter'
@@ -120,34 +125,31 @@ end
 
 
 post '/signin' do
-  password = Digest::SHA2.hexdigest(params[:password] + User::SALT)
-  user = User.find_by(email: params[:email], password: password)
-  if user    
-    session[:name] = user.name
-    session[:email]= user.email
-    session[:user_id] = user.id
-    session[:all]  = user, password
+  @user_check = User.new(password: params[:password])
+  @user_check = @user_check.hash
+  @user = User.find_by_email(params[:email])
+  if User.is_persisted?(params[:email]) && @user_check == @user.password
+    session[:all] = @user
+    redirect '/'
+  else
+    flash[:error]="check email or password"
     redirect '/'
   end
-  redirect '/'
 end
 
 
 get '/enter' do
-  erb :'registration/enter'
+  erb :"registration/enter"
 end
+
+
+get "/reg" do
+  @title='Sign up'
+  erb :"registration/register"      
+end
+
 
 post '/logout' do
   session.clear
   redirect '/'
 end 
-
-def user_params
-  permit params, :name, :email, :password
-end
-
-def permit hash, *keys #filters hash for unavailable parameters
-  result = {}
-  keys.each { |k| result[k] = hash[k] }
-  result 
-end

@@ -1,26 +1,30 @@
 class User < ActiveRecord::Base
-	SALT = 'luck'
 	attr_accessor :password_second
-	validates :name, :presence => true
-	validates :password, :length => {:minimum => 6}, :presence => true
-    validates :email, :length => {:minimum => 6}, :presence => true, :uniqueness => true
-	has_many :posts, :dependent => :destroy
+	SALT = 'ruby'
+    validates :email, presence: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i, 
+              message: "only allows letters"}
+    validates :name, presence: true
+    validates :password, presence: true , length: { minimum: 6,
+              message: "minimum 6 symbols" }
+	has_many  :posts, :dependent => :destroy
+	validate :check_password
+	validate :check_email
+	before_save :hash
 
-	before_save :encrypt_password
-	validate :check_passwords_equality
-
+	
 	def self.is_persisted? email
-		User.find_by_email email 	
+		user = User.find_by_email email 
 	end
 
-	private
-
-	def encrypt_password 
-		self.password = Digest::SHA2.hexdigest(password + SALT)
+	def check_email
+		errors[:email] = 'this email already exists' if User.find_by_email email
 	end
 
-	def check_passwords_equality 
-		errors[:password] = 'must equals to second password' unless password == password_second
+	def check_password
+		errors[:password] = 'password does not match' unless password == password_second
 	end
 
+	def hash 
+	  self.password = Digest::SHA2.hexdigest(password + SALT)
+	end
 end

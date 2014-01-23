@@ -1,5 +1,5 @@
-<h1><%= @post.title %></h1>
-<p><%= @post.body %></p>
+<h1><%= h @post.title %></h1>
+<p><%= h @post.body %></p>
 <%if post_show_page? %>
   <%= delete_post_button(@post.id) %>
 <% end %>
@@ -9,10 +9,18 @@
       <div class="panel panel-default">
         <div class="panel-body">                
           <form action="/posts/<%= @post.id %>/create_comment" method="post">
+            <textarea  class="form-control counted" if="title" name="title" placeholder="Title" rows="1"></textarea>
+            <% if @comm %>
+              <% @comm.errors[:title].each do |title| %>
+                <p class="help-block"><%= title %></p>
+              <% end %>
+            <% end %>
             <textarea class="form-control counted" id="body" name="body" placeholder="Your comment" rows="5"></textarea>
             <button class="btn btn-info" type="submit">Add new comment</button>
-            <% if flash[:error_comment] %>
-              <div class="alert alert-danger"><%=flash[:error_comment]%></div>
+            <% if @comm %>
+              <% @comm.errors[:body].each do |body| %>
+                <p class="help-block"><%= body %></p>
+              <% end %>
             <% end %>
           </form>
         </div>
@@ -22,20 +30,21 @@
 </div>
 
 <fieldset>
-    <div id="legend">
-      <legend class="">Comments</legend>
-    </div>
-<% @post = Post.find_by_id(params[:id]) %>
+  <div id="legend">
+    <legend class="">Comments</legend>
+  </div>
+<% @post=Post.find_by_id(params[:id]) %>
 <% if @post.comments.find_by(post_id: params[:id]) %>
 <% @post.comments.each do |comment| %>
 <div class="comm">
-    <div class="control-group">                  
-      <div class="controls">
-        <% if comment.user_name %>
-      <label class="control-label">User:<%= comment.user_name %></label>
+  <div class="control-group">                  
+    <div class="controls">
+      <% if comment.user_id %>
+        <label class="control-label">User:<%= comment.user.name %></label>
       <% else %>
-      <label class="control-label">User:<%= "Anonym" %></label>
-      <% end %>
+        <label class="control-label">User:<%= "Anonym" %></label>
+      <% end %>  
+      <input class="form-control" id="disabledInput" type="text" placeholder="Title:<%= comment.title %>" disabled>
         <div class="row">
           <div class="col-sm-4 col-md-4">
             <div class="panel panel-default">

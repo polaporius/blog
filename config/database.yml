@@ -2,23 +2,20 @@ production:
   adapter: postgresql
   encoding: unicode
   pool: 5
-  database: dt1onamu3t4un
-  username: znnmschotekqxc
-  password: htPrnNZnKJ8Ai1n_EugVMuzJzP
-  host: ec2-54-204-42-135.compute-1.amazonaws.com
+  database: d1eibrdh4fqouj
+  username: mfuqsxjfotetap
+  password: _LCyhDVWyJ5WKqtQSqnmWH6io_
+  host: ec2-54-225-135-30.compute-1.amazonaws.com
   port: 5432
 
-# SQLite version 3.x
+  # SQLite version 3.x
 #   gem install sqlite3-ruby (not necessary on OS X Leopard)
 development:
   adapter: sqlite3
-  database: db/development.sqlite3
+  database: db/blog.sqlite3
   pool: 5
   timeout: 5000
- 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
+
 test:
   adapter: sqlite3
   database: db/test.sqlite3
