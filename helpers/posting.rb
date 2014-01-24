@@ -30,7 +30,7 @@ module Posting
   end
 
   def author? post
-    post.user == User.find_by(email: session[:all].email)
+    post.user == User.find_by(email: session[:all].email) unless session[:all]==nil
   end
 
   def h(text)

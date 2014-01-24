@@ -30,11 +30,13 @@ end
 
 post "/posts/:id/create_comment" do
   @post = Post.find(params[:id])
+  @name = session[:all].name unless session[:all]==nil
+  @id = session[:all].id unless session[:all]==nil
   @comm = Comment.new(title: params[:title],
                       body: params[:body],
                       post_id: params[:id],
-                      user_name: session[:all].name,
-                      user_id: session[:all].id)
+                      user_name: @name,
+                      user_id: @id)
   @comm.save
   unless @comm.errors.empty?
     @comm.valid?
